@@ -338,6 +338,9 @@ while true; do
 		fi
 	fi
 	
+	if [[ "${1}" == "bilibili" ]]; then
+		ffmpeg -i "${DIR_LOCAL}/${FNAME}" "${DIR_LOCAL}/${FNAME}.mp4" ; echo "ffmpeg finished"
+	fi
 	
 	
 	if [[ ! -f "${DIR_LOCAL}/${FNAME}" ]] || [[ $(ls -l "${DIR_LOCAL}/${FNAME}" | awk '{print $5}') == 0 ]]; then #判断是否无录像
@@ -373,8 +376,8 @@ while true; do
 		ONEDRIVE_FILE_RETRY=1 ; ONEDRIVE_FILE_ERRFLAG=0
 		if [[ "${BACKUP_DISK}" == *"onedrive"* ]]; then
 			until [[ ${ONEDRIVE_FILE_RETRY} -gt ${BACKUP_RETRY_MAX} ]]; do
-				LOG_PREFIX=$(date +"[%Y-%m-%d %H:%M:%S]") ; echo "${LOG_PREFIX} upload onedrive ${DIR_LOCAL}/${FNAME} start retry ${ONEDRIVE_FILE_RETRY}"
-				ONEDRIVE_FILE_ERRLOG=$(OneDriveUploader -s "${DIR_LOCAL}/${FNAME}" -r "${DIR_ONEDRIVE}")
+				LOG_PREFIX=$(date +"[%Y-%m-%d %H:%M:%S]") ; echo "${LOG_PREFIX} upload onedrive ${DIR_LOCAL}/${FNAME}.mp4 start retry ${ONEDRIVE_FILE_RETRY}"
+				ONEDRIVE_FILE_ERRLOG=$(OneDriveUploader -s "${DIR_LOCAL}/${FNAME}.mp4" -r "${DIR_ONEDRIVE}")
 				ONEDRIVE_FILE_ERRFLAG=$?
 				[[ "${ONEDRIVE_FILE_ERRFLAG}" == 0 ]] && (LOG_PREFIX=$(date +"[%Y-%m-%d %H:%M:%S]") ; echo "${LOG_PREFIX} upload onedrive ${DIR_LOCAL}/${FNAME} success") && break
 				let ONEDRIVE_FILE_RETRY++
@@ -422,7 +425,7 @@ while true; do
 		LOG_PREFIX=$(date +"[%Y-%m-%d %H:%M:%S]") #清除文件
 		[[ "${BACKUP}" == *"keep" ]] && (echo "${LOG_PREFIX} force keep ${DIR_LOCAL}/${FNAME}" ; echo "${LOG_PREFIX} force keep ${DIR_LOCAL}/${FNAME}.log")
 		[[ "${BACKUP}" == *"del" ]] && (echo "${LOG_PREFIX} force delete ${DIR_LOCAL}/${FNAME}" ; rm -f "${DIR_LOCAL}/${FNAME}" ; echo "${LOG_PREFIX} force delete ${DIR_LOCAL}/${FNAME}.log" ; rm -f "${DIR_LOCAL}/${FNAME}.log")
-		[[ "${BACKUP}" == "rclone" || "${BACKUP}" == "onedrive" || "${BACKUP}" == "baidupan" || "${BACKUP}" == *[0-9] ]] && [[ "${RCLONE_FILE_ERRFLAG}" == "" ]] && [[ "${ONEDRIVE_FILE_ERRFLAG}" == 0 ]] && (echo "${BAIDUPAN_FILE_ERRFLAG}" | grep -q "成功") && (echo "${LOG_PREFIX} remove ${DIR_LOCAL}/${FNAME}" ; rm -f "${DIR_LOCAL}/${FNAME}")
+		[[ "${BACKUP}" == "rclone" || "${BACKUP}" == "onedrive" || "${BACKUP}" == "baidupan" || "${BACKUP}" == *[0-9] ]] && [[ "${RCLONE_FILE_ERRFLAG}" == "" ]] && [[ "${ONEDRIVE_FILE_ERRFLAG}" == 0 ]] && (echo "${BAIDUPAN_FILE_ERRFLAG}" | grep -q "成功") && (echo "${LOG_PREFIX} remove ${DIR_LOCAL}/${FNAME}" ; rm -f "${DIR_LOCAL}/${FNAME}" ; rm -f "${DIR_LOCAL}/${FNAME}.mp4")
 		[[ "${BACKUP}" == "rclone" || "${BACKUP}" == "onedrive" || "${BACKUP}" == "baidupan" || "${BACKUP}" == *[0-9] ]] && [[ "${RCLONE_LOG_ERRFLAG}" == "" ]] && [[ "${ONEDRIVE_LOG_ERRFLAG}" == 0 ]] && (echo "${BAIDUPAN_LOG_ERRFLAG}" | grep -q "成功") && (echo "${LOG_PREFIX} remove ${DIR_LOCAL}/${FNAME}.log" ; rm -f "${DIR_LOCAL}/${FNAME}.log")
 	fi
 	) &
